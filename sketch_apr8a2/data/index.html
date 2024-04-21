@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+ <head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="/style.css">
+  <script type="text/javascript" src="/main.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Доп. настройки</title>
+  <script type="text/javascript">
+    var set_real_time;
+   function handleServerResponse(){
+    clearTimeout(set_real_time);
+    var res = jsonResponse.time.split(":");
+    real_time(hours=res[0],min=res[1],sec=res[2]);
+    document.body.style.backgroundColor="rgb("+jsonResponse.rgb+")";
+   }
+   function real_time(hours,min,sec) {
+   sec=Number(sec)+1;
+    if (sec>=60){min=Number(min)+1;sec=0;}
+    if (min>=60){hours=Number(hours)+1;min=0;}
+    if (hours>=24){hours=0};
+    document.getElementById("time").innerHTML = hours+":"+min+":"+sec;
+    set_real_time = setTimeout("real_time("+hours+","+min+","+sec+");", 1000);
+   }
+   function set_ssid(submit){
+    server = "/ssid?ssid="+val('ssid')+"&password="+encodeURIComponent(val('password'));
+    send_request(submit,server);
+    alert("Измененя вступят в силу после перезагрузки. Пожалуйта перезагрузите устройство.");
+   }
+   function set_mqtt(submit){
+    server = "/mqtt?mqtt_server="+val('mqtt_server')+"&port="+encodeURIComponent(val('port'));
+    send_request(submit,server);
+    alert("Изменения вступят в силу после перезагрузки. Пожалуйта перезагрузите устройство.");
+   }
+   function restart(submit,texts){
+    if (confirm(texts)) {
+	 server = "/restart?device=ok";
+     send_request(submit,server);
+     return true;
+    } else {
+     return false;
+    }
+   }
+  </script>
+ </head>
+ <body onload="load();">
+  <div class="container">
+   <div class="row" style="text-align:center;">
+    <h1 style="margin:50px;">Настройки подключения</h1>
+    <div class="col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6">
+     <div class="alert alert-dismissible alert-warning"><strong>Пожалуйста подключитесь к своему роутеру и MQTT брокеру.</strong>
+    </div>
+     <hr>
+     <h2>Подключение к WiFi роутеру</h2>
+     <input id="ssid" class="form-control" placeholder="Имя WiFi сети">
+     <input id="password" onfocus="this.type='text'" type="password" class="form-control" placeholder="Пароль">
+     <input class="btn btn-block btn-success" value="Сохранить" onclick="set_ssid(this);" type="submit">
+     <hr>
+     <h2>Подключение к MQTT брокеру</h2>
+     <input id="mqtt_server" class="form-control" placeholder="IP MQTT брокера">
+     <input id="port" onfocus="this.type='text'" type="password" class="form-control" placeholder="Порт">
+     <input class="btn btn-block btn-success" value="Сохранить" onclick="set_mqtt(this);" type="submit">
+     <hr>
+     <input class="btn btn-block btn-warning" value="Перезагрузить устройство" onclick="restart(this,'Вы действительно хотите перезагрузить устройство?');" type="submit">
+    </div>
+   </div>
+  </div>
+ </body>
+</html>
